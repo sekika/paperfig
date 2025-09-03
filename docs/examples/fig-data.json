@@ -1,0 +1,29 @@
+{
+  "1": {
+    "type": "csv_plot",
+    "title": "Sensor A (points)",
+    "data": { "file": "data/sensor_a.csv", "x_col": 0, "y_col": 1, "delimiter": ",", "style": "points" }
+  },
+  "2": {
+    "type": "csv_plot",
+    "title": "Sensor B (points)",
+    "data": { "file": "data/sensor_b.csv", "x_col": 0, "y_col": 2, "delimiter": ",", "style": "points" }
+  },
+  "3": {
+    "type": "multi",
+    "row": 1,
+    "column": 2,
+    "figures": {
+      "3a": {
+        "type": "csv_plot",
+        "title": "A zoomed (points)",
+        "data": { "file": "data/sensor_a.csv", "x_col": 0, "y_col": 1, "delimiter": ",", "style": "points", "x_max": 100 }
+      },
+      "3b": {
+        "type": "csv_plot",
+        "title": "B zoomed (points)",
+        "data": { "file": "data/sensor_b.csv", "x_col": 0, "y_col": 2, "delimiter": ",", "style": "points", "x_max": 100 }
+      }
+    }
+  }
+}

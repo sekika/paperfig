@@ -1,0 +1,55 @@
+{
+  "1": {
+    "type": "sine",
+    "title": "Basic sine",
+    "amplitude": 1.0,
+    "frequency": 2,
+    "samples": 400
+  },
+  "2": {
+    "type": "scatter",
+    "title": "Correlated scatter",
+    "n": 300,
+    "rho": 0.7,
+    "seed": 42
+  },
+  "3": {
+    "type": "multi",
+    "row": 2,
+    "column": 2,
+    "figures": {
+      "3a": {
+        "type": "sine",
+        "title": "Noisy sine",
+        "amplitude": 1.0,
+        "frequency": 5,
+        "samples": 300,
+        "noise": 0.2,
+        "seed": 0
+      },
+      "3b": {
+        "type": "hist",
+        "title": "Normal histogram",
+        "dist": "normal",
+        "n": 1000,
+        "bins": 30,
+        "seed": 123
+      },
+      "3c": {
+        "type": "scatter",
+        "title": "Weakly correlated",
+        "n": 200,
+        "rho": 0.3,
+        "seed": 7
+      },
+      "3d": {
+        "type": "sine",
+        "title": "Damped sine",
+        "amplitude": 1.0,
+        "frequency": 3,
+        "samples": 400,
+        "damping": 0.6
+      }
+    }
+  }
+}
