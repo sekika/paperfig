@@ -85,7 +85,8 @@ class Fig:
             with self.json_filename.open(encoding="utf-8") as f:
                 self.list: Dict[str, Dict[str, Any]] = json.load(f)
         except json.JSONDecodeError as e:
-            raise FigError(f"Failed to parse JSON: {self.json_filename}: {e}") from e
+            raise FigError(
+                f"Failed to parse JSON: {self.json_filename}: {e}") from e
         self._validate_json()
 
     def save_json(self) -> None:
@@ -93,11 +94,13 @@ class Fig:
             with self.json_filename.open("w", encoding="utf-8") as f:
                 json.dump(self.list, f, indent=2, ensure_ascii=False)
         except OSError as e:
-            raise FigError(f"Failed to write JSON: {self.json_filename}: {e}") from e
+            raise FigError(
+                f"Failed to write JSON: {self.json_filename}: {e}") from e
 
     def _validate_json(self) -> None:
         if not isinstance(self.list, dict):
-            raise FigError("Root of JSON must be an object mapping id -> figure spec.")
+            raise FigError(
+                "Root of JSON must be an object mapping id -> figure spec.")
         for idx, node in self.list.items():
             if not isinstance(idx, str):
                 raise FigError(f"Figure id must be a string, got: {idx!r}")
@@ -105,14 +108,17 @@ class Fig:
                 raise FigError(f"Figure '{idx}' spec must be an object.")
             t = node.get("type")
             if not isinstance(t, str):
-                raise FigError(f"Figure '{idx}' must have a string 'type' field.")
+                raise FigError(
+                    f"Figure '{idx}' must have a string 'type' field.")
             if t == "multi":
                 figs = node.get("figures")
                 if not isinstance(figs, dict):
-                    raise FigError(f"Figure '{idx}': multi requires 'figures' object.")
+                    raise FigError(
+                        f"Figure '{idx}': multi requires 'figures' object.")
                 for k, sub in figs.items():
                     if not isinstance(sub, dict):
-                        raise FigError(f"Figure '{idx}': sub-figure '{k}' must be object.")
+                        raise FigError(
+                            f"Figure '{idx}': sub-figure '{k}' must be object.")
                     st = sub.get("type")
                     if not isinstance(st, str):
                         raise FigError(
@@ -120,7 +126,8 @@ class Fig:
                         )
                 for key in ("row", "column"):
                     if key not in node:
-                        raise FigError(f"Figure '{idx}': multi requires '{key}'.")
+                        raise FigError(
+                            f"Figure '{idx}': multi requires '{key}'.")
 
     def register(self, type_name: str, renderer: Renderer) -> None:
         self.function[type_name] = renderer
@@ -156,21 +163,26 @@ class Fig:
                 if callable(func):
                     return func
             except Exception as e:
-                raise FigError(f"Failed to import renderer '{type_name}': {e}") from e
+                raise FigError(
+                    f"Failed to import renderer '{type_name}': {e}") from e
         return None
 
-    def create_pdf(self) -> None:
+    def create_pdf(self, index=None) -> None:
+        index_argument = index
         self._apply_verbose()
         self.fig_dir = self.fig_dir  # normalize
         try:
             self.fig_dir.mkdir(parents=True, exist_ok=True)
         except OSError as e:
-            raise FigError(f"Cannot create output directory: {self.fig_dir}: {e}") from e
+            raise FigError(
+                f"Cannot create output directory: {self.fig_dir}: {e}") from e
 
         self.result = {}
         fig_files: list[Path] = []
 
         for index, data in self.list.items():
+            if index_argument and index_argument != index:
+                continue
             t = data.get("type")
             if not isinstance(t, str):
                 raise FigError(f"Figure '{index}' has invalid 'type': {t!r}")
@@ -188,11 +200,13 @@ class Fig:
 
             renderer = self._resolve_renderer(t)
             if renderer is None:
-                raise FigError(f"type '{t}' not defined/resolvable for figure '{index}'")
+                raise FigError(
+                    f"type '{t}' not defined/resolvable for figure '{index}'")
 
             self._logger.info(f"Rendering {index} (type={t})")
             try:
-                self.result[index] = renderer(index, data, verbose=self.verbose)
+                self.result[index] = renderer(
+                    index, data, verbose=self.verbose)
             except TypeError:
                 raise
 
@@ -207,7 +221,13 @@ class Fig:
             raise FigError("No figures were produced; nothing to concatenate.")
 
         out_file = self.fig_dir / self.pdf_filename
-        self._logger.info(f"Concatenating {len(fig_files)} pages -> {out_file}")
+        if index_argument:
+            if self.verbose > 0:
+                self._logger.info(f"Finished creating fig{index_argument}.pdf")
+            return
+
+        self._logger.info(
+            f"Concatenating {len(fig_files)} pages -> {out_file}")
         try:
             concat_pdf_pages(
                 input_files=[str(p) for p in fig_files],
@@ -224,11 +244,13 @@ class Fig:
     def multi(self, parent_index: str, fig: Dict[str, Any]) -> Dict[str, Any]:
         figs = fig.get("figures")
         if not isinstance(figs, dict):
-            raise FigError(f"Figure '{parent_index}': multi requires 'figures' object.")
+            raise FigError(
+                f"Figure '{parent_index}': multi requires 'figures' object.")
         row = fig.get("row")
         col = fig.get("column")
         if not isinstance(row, int) or not isinstance(col, int):
-            raise FigError(f"Figure '{parent_index}': 'row' and 'column' must be integers.")
+            raise FigError(
+                f"Figure '{parent_index}': 'row' and 'column' must be integers.")
 
         result: Dict[str, Any] = {}
         fig_files: list[Path] = []
@@ -236,11 +258,14 @@ class Fig:
         for index, data in figs.items():
             t = data.get("type")
             if not isinstance(t, str):
-                raise FigError(f"Figure '{parent_index}': sub-figure '{index}' has invalid 'type'.")
+                raise FigError(
+                    f"Figure '{parent_index}': sub-figure '{index}' has invalid 'type'.")
             renderer = self._resolve_renderer(t)
             if renderer is None:
-                raise FigError(f"type '{t}' not defined in multi() for '{index}'")
-            self._logger.info(f"Rendering sub-figure {index} (type={t}) of {parent_index}")
+                raise FigError(
+                    f"type '{t}' not defined in multi() for '{index}'")
+            self._logger.info(
+                f"Rendering sub-figure {index} (type={t}) of {parent_index}")
             res = renderer(index, data, verbose=self.verbose)
             result[index] = res
 
@@ -260,6 +285,7 @@ class Fig:
                 row=row,
             )
         except Exception as e:
-            raise FigError(f"Concatenation for multi '{parent_index}' failed: {e}") from e
+            raise FigError(
+                f"Concatenation for multi '{parent_index}' failed: {e}") from e
 
         return result

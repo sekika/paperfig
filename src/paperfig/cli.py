@@ -41,14 +41,18 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> None:
-    p = argparse.ArgumentParser(prog="paperfig", description="Build figures from JSON spec")
+    p = argparse.ArgumentParser(
+        prog="paperfig", description="Build figures from JSON spec")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     p_build = sub.add_parser("build", help="Build and concatenate figures")
     p_build.add_argument("json_file", type=Path, help="Path to JSON spec")
-    p_build.add_argument("-o", "--output", default="figures.pdf", help="Output PDF filename")
-    p_build.add_argument("-d", "--outdir", default="fig", help="Output directory")
-    p_build.add_argument("-v", "--verbose", type=int, default=1, help="Verbosity (0/1/2)")
+    p_build.add_argument(
+        "-o", "--output", default="figures.pdf", help="Output PDF filename")
+    p_build.add_argument("-d", "--outdir", default="fig",
+                         help="Output directory")
+    p_build.add_argument("-v", "--verbose", type=int,
+                         default=1, help="Verbosity (0/1/2)")
     p_build.set_defaults(func=cmd_build)
 
     p_val = sub.add_parser("validate", help="Validate JSON spec only")
