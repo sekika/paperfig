@@ -91,6 +91,11 @@ class Fig:
 
     def save_json(self) -> None:
         try:
+            json.dumps(self.list)
+        except OSError as e:
+            raise FigError(
+                f"Failed to convert JSON: {self.list}: {e}") from e
+        try:
             with self.json_filename.open("w", encoding="utf-8") as f:
                 json.dump(self.list, f, indent=2, ensure_ascii=False)
         except OSError as e:
